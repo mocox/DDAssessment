@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using DDAssessment;
 using DDAssessment.FileStore;
 using DDAssessment.Sorters;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,8 +11,11 @@ Console.WriteLine("Dye & Durham Assessment");
 string filePath = "unsorted-names-list.txt";
 #if !DEBUG
 
-    if (args.Length == 0) throw new ArgumentException("Please provide a file path");
-    filepath = args[0];
+    if (args.Length == 0) {
+        Console.WriteLine("File path missing. Please provide a file path.");
+        return;
+    }
+    filePath = args[0];
 
 #endif
 
@@ -20,6 +24,7 @@ var serviceProvider = new ServiceCollection()
     .AddScoped<IFileWrapper, FileWrapper>()
     .AddScoped<IFileHandler, FileHandler>()
     .AddScoped<INameSorter, NameSorter>()
+    .AddScoped<IAppRunner,AppRunner>()
     .BuildServiceProvider();
 
 Log.Logger = new LoggerConfiguration()
@@ -28,24 +33,9 @@ Log.Logger = new LoggerConfiguration()
     .Console()
     .CreateLogger();
 
-Log.Information("Starting application");
 
-var nameSorter = serviceProvider.GetService<INameSorter>();
-var lines = await nameSorter!.SortNamesAsync(filePath);
-
-await nameSorter.SaveSortedNamesAsync(lines);
-
-Console.WriteLine("Sorted File Contents");
-Console.WriteLine("====================");
-var sortedLines = await nameSorter.GetSortedNamesAsync();
-
-foreach (var line in sortedLines)
-{
-    Console.WriteLine(line);
-}
-Console.WriteLine("====================");
-
-Log.Information("Application finished");
+var app = serviceProvider.GetService<IAppRunner>();
+await app!.RunAsync(filePath);
 
 
 Console.ReadKey();

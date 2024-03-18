@@ -7,7 +7,7 @@ namespace DDAssessment.Sorters;
 
 public class NameSorter(IFileHandler fileHandler): INameSorter
 {
-    const string FilePath = "sorted-names-list.txt";
+    const string SortedNamesFilePath = "sorted-names-list.txt";
 
     public async Task<IEnumerable<string>> SortNamesAsync(string filePath)
     {
@@ -31,14 +31,14 @@ public class NameSorter(IFileHandler fileHandler): INameSorter
 
     public async Task<IEnumerable<string>> GetSortedNamesAsync()
     {
-        return await fileHandler.GetFileAsync(FilePath);
+        return await fileHandler.GetFileAsync(SortedNamesFilePath);
     }
 
     public Task<bool> SaveSortedNamesAsync(IEnumerable<string> content)
     {
         var fileContent = string.Join(Environment.NewLine, content);
 
-        return fileHandler.SaveFileAsync(FilePath, fileContent);
+        return fileHandler.SaveFileAsync(SortedNamesFilePath, fileContent);
     }
 
     private static Task<FullNameModel> BuildModel(string name)
